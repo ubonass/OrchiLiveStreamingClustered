@@ -55,17 +55,12 @@ public class RealStream implements Stream{
 
 	
 	public RealStream(String id, UserSession presenterUser) {
-
 		this.setId(id);
 		this.setPresenterUser(presenterUser);
-
 		setConnection(ConnectionManager.getInstance().getConnectionWithLeastClients());
 		setPipeline(getConnection().getConnection().createMediaPipeline());
-		
-		
-		
+
 		presenterUser.setWebRtcEndpoint(new WebRtcEndpoint.Builder(pipeline).build());
-		
 
 		
 		WebRtcEndpoint presenterWebRtc = presenterUser.getWebRtcEndpoint();

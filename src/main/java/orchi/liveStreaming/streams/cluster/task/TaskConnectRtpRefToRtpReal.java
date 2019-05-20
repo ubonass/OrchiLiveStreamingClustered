@@ -20,6 +20,10 @@ public class TaskConnectRtpRefToRtpReal implements Callable<String>, Serializabl
 		this.offer = offer;
 	}
 
+	/*
+	* 当Host B提交submitTaskToMembers任务并指定相应的idMember时候
+	*  假设此时A收到请求,那么这段函数应该是在A host中执行,而不是在B中执行
+	* */
 	@Override
 	public String call() throws Exception {
 		// ambito del otro pc
@@ -29,6 +33,9 @@ public class TaskConnectRtpRefToRtpReal implements Callable<String>, Serializabl
 			// log.info("No existe stream en este nodo");
 			throw new Exception("No existe stream en este nodo");
 		}
+		/**
+		 * A开始处理sdpOffer并返回sdpAnswer
+		 */
 		String procesAnswer = stream.getRtpByHostid(this.idMember).processOffer(offer);
 		return procesAnswer;
 	}

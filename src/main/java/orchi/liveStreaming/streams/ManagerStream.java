@@ -21,24 +21,20 @@ import orchi.liveStreaming.streams.cluster.MemberCluster;
 import orchi.liveStreaming.streams.cluster.task.TaskConnectRtpRefToRtpReal;
 
 public class ManagerStream {
-	
-
 
 	public static final Logger log = LoggerFactory.getLogger(ManagerStream.class);
 	//private Random ran = new Random();
 	private static ManagerStream instance;
 	/**Streams locales*/
-	private ConcurrentHashMap<String, Stream> streams = new ConcurrentHashMap<String, Stream>();
-	
+	private ConcurrentHashMap<String, Stream> streams =
+			new ConcurrentHashMap<String, Stream>();
 	/**streams en cluster, idStream->idMember*/
 	private IMap<String, String> streamsClusterMap;
 	
 	
 	public ManagerStream(){
 		MemberCluster.getInstance();
-		
 		streamsClusterMap = MemberCluster.getInstance().getHazel().getMap("streamsClusterMap");
-		
 	}
 	
 	
@@ -59,8 +55,9 @@ public class ManagerStream {
 	}
 	   
 	public RealStream createStream(UserSession user,JsonObject jsonMessage){
-		log.info("creando nuevo stream para session {}",user.getSession().getId());
+		//log.info("creando nuevo stream para session {}",user.getSession().getId());
 		String id = UUID.randomUUID().toString();
+		log.info("creando nuevo stream para session {} ,id {}",user.getSession().getId(),id);
 		RealStream stream = new RealStream(id,user);
 		
 		String sdpOffer = jsonMessage.getAsJsonPrimitive("sdpOffer").getAsString();
@@ -86,6 +83,8 @@ public class ManagerStream {
 		}
 		presenterWebRtc.gatherCandidates();
 		streams.put(id, stream);
+		log.info("idMember {}",
+				MemberCluster.getInstance().getIdMember());
 		streamsClusterMap.put(id,MemberCluster.getInstance().getIdMember());
 		return stream;
 	}
@@ -94,8 +93,10 @@ public class ManagerStream {
 		Stream stream = null;
 		stream = streams.get(id);
 		if(searchincluster){
-			if(stream == null){
+			if(stream == null){//如果从本地没找到这一路stream
+				//假设集群管理的这个Map中包含这个id，value为对应的host集群的uuid标识
 				if(streamsClusterMap.containsKey(id)){
+					log.info("streamsClusterMap containsKey :" + id);
 					stream = connectRefStreamToRealStream(id);
 				}else{
 					return null;
@@ -140,16 +141,23 @@ public class ManagerStream {
 		log.warn("connectRefStreamToRealStream: {}",idStream);
 		
 		RefStream refStream = new RefStream(idStream, null);
-		
+
+		//先创建一个rtpEndpoint in hostB
 		RtpEndpoint rtpRef = refStream.createAndGetRtpEndPoint();
-		
+
+		//在host B 上创建offer
 		String offerGenerateRefStream = rtpRef.generateOffer();
 		log.info("rtpRef {}",rtpRef);
-		
+
+		//远程标识
 		final String idHostContentStream = streamsClusterMap.get(idStream);
 		
 		log.info("enviando tarea a {} nodo con stream {}, offertGenerate \n{}",idHostContentStream,idStream,offerGenerateRefStream);
-		
+
+		/**
+		 * 这个意思是不是可以理解成找到对应标识流的进行processAnswer处理
+		 * 提交一个异步任务
+		 */
 		@SuppressWarnings("unchecked")
 		Future<String> processAnswer = (Future<String>) MemberCluster
 		.getInstance()

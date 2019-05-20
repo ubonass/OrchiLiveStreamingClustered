@@ -18,7 +18,8 @@ import org.slf4j.LoggerFactory;
 
 public class ConnectionManager {
 	private static final Logger log = LoggerFactory.getLogger(ConnectionManager.class);
-	private ConcurrentHashMap<String, Integer> mapCounterClientsPeerConnection = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, Integer> mapCounterClientsPeerConnection =
+			new ConcurrentHashMap<>();
 	private static ConnectionManager instance;
 	private Random ran = new Random();
 	private AtomicInteger counter = new AtomicInteger();

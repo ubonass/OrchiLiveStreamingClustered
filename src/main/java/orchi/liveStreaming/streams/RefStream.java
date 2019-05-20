@@ -40,7 +40,6 @@ public class RefStream implements Stream{
 	public RefStream(String id, UserSession presenterUser){
 		this.id = id;
 		//this.setPresenterUser(presenterUser);
-
 		setConnection(ConnectionManager.getInstance().getConnectionWithLeastClients());
 		setPipeline(getConnection().getConnection().createMediaPipeline());
 		

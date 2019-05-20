@@ -14,7 +14,6 @@ public class Connection {
 		this.setConnection(connection);		
 	}
 
-
 	@Override
 	public String toString() {
 		return "Connection {id=" + id + ", connection=" + connection + ", counter=" + counter + "}";

@@ -28,10 +28,9 @@ public class MemberCluster{
 			Config confg = new XmlConfigBuilder(ManagerStream.class.getResource("/hazelcastClient.xml").openStream())
 					.build();
 			setHazel(Hazelcast.newHazelcastInstance(confg));
-
+			//应该用于标记本台host的uuid标识
 			setIdMember(getHazel().getCluster().getLocalMember().getUuid());
-			
-			
+
 			executorService = getHazel().getExecutorService("streamsConnector");
 
 		} catch (IOException e) {

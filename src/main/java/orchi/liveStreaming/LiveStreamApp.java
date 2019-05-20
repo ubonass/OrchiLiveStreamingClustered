@@ -37,7 +37,6 @@ public class LiveStreamApp implements WebSocketConfigurer {
   @Bean
   public StreamHandler callHandler() {
     StreamHandler handler = new StreamHandler();
-
 	return handler ;
   }
 
